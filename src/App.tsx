@@ -1,10 +1,14 @@
 
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import './App.css';
 import UserList from './user-list';
 
 function App(props: { name: string }) {
   const { register, handleSubmit } = useForm();
+  const [error, setError] = useState(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [items, setItems] = useState([]);
   const styles = {
     container: {
       width: "80%",
@@ -17,10 +21,30 @@ function App(props: { name: string }) {
   const onSubmit = (data: any) => {  
     console.log(data);
    };
+
+   useEffect(() => {
+    fetch("http://localhost:8080/customers")
+      .then(res => res.json())
+      .then(
+        (result) => {
+          setIsLoaded(true);
+          setItems(result);
+        },
+        // Note: it's important to handle errors here
+        // instead of a catch() block so that we don't swallow
+        // exceptions from actual bugs in components.
+        (error) => {
+          setIsLoaded(true);
+          setError(error);
+        }
+      )
+  }, [])
+
   return (
     <div style={styles.container}>
     <UserList></UserList>
 
+    <br></br>
 
       <h4>Signup</h4>
       
